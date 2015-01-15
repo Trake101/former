@@ -144,10 +144,18 @@ class FormerServiceProvider extends ServiceProvider
 	public function bindFormer(Container $app)
 	{
 		// Add config namespace
-		$app['config']->package('anahkiasen/former', __DIR__.'/../config');
+		$defaultConfigPath = __DIR__ . '/../config/config.php';
+
+	        // Load the default config
+	        $config = $this->app['files']->getRequire($defaultConfigPath);
+	
+	        // Set each of the items like ->package() previously did
+	        $this->app['config']->set('former::framework', $config);
+	        $this->app['view']->addNamespace('former', __DIR__ . '/../../views');
+	        $this->app['translator']->addNamespace('former', __DIR__ . '/../../lang');
 
 		$app->bind('former.framework', function ($app) {
-			return $app['former']->getFrameworkInstance($app['config']->get('former::framework'));
+			return $app['former']->getFrameworkInstance($app['config']->get('former::framework.framework'));
 		});
 
 		$app->singleton('former.populator', function ($app) {
